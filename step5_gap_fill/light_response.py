@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy import optimize
 from scipy import stats
-
+# import statsmodels.api as sm
 
 def func(PAR, p):
     '''
@@ -159,7 +159,7 @@ if __name__ == '__main__':
          0.032, 0.048, 0.043, 0.026, 0.043, 0.657, 14.04, 64.28, 109.5, 160.7, 240.1, 298.7, 377.5, 439.2, 479.7, 493.4,
          515.8, 534.9, 503.5, 451.7, 398.4, 347.9, 271.8, 186.4, 101.2, 31.79, 2.173, 0.035, 0.025, 0.038, 0.031]
 
-
+    print(len(x))
     y = \
         [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, -2.08320723823546,
          -2.08320723823546, -2.08320723823546, 0.80599349260002, 0.373249690311264, -0.274293100785627,
@@ -309,7 +309,24 @@ if __name__ == '__main__':
 
     y = pd.Series(y)
     x = pd.Series(x)
+    df = pd.DataFrame({
+        'co2': y,
+        'par': x
+    })
+    a = df.loc[:500]
+    b = a.dropna()
+    # print(b)
+    # p0 = [7, 0.4, 0.1]
+    # plsq = optimize.leastsq(residuals, p0, args=(b['co2'], b['par']))
+    # print(plsq[0])
 
+
+
+    a = df.loc[500:]
+    b = a.dropna()
+    # print(b)
     p0 = [7, 0.4, 0.1]
-    plsq = optimize.leastsq(residuals, p0, args=(y, x))
-    print(plsq[0])
+    plsq = optimize.leastsq(residuals, p0, args=(b['co2'], b['par']))
+    ym = func(b['par'], plsq[0])
+    t, p = stats.ttest_ind(b['co2'], ym)
+    print(t, p)

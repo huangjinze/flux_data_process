@@ -1,10 +1,14 @@
 import numpy as np
 import pandas as pd
-def linear_insert_method(data, value, interval=4):
-    temp = data[value]
-    temp = temp.interpolate(time=interval, limit=int(interval/2), limit_direction='both')
-    data[value] = temp
-    return data
+
+class LinearInsert:
+    def linear_insert_method(self, data, value, li_interval):
+        temp = data[value]
+        temp = temp.interpolate(time=li_interval, limit=int(li_interval/2), limit_direction='both')
+        data[value] = temp
+        return data
+
+
 
 if __name__ == '__main__':
     data = pd.DataFrame({

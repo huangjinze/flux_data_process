@@ -1,37 +1,42 @@
 import pandas as pd
 import numpy as np
-'''
-# data 总数据集合
-# value ：需要插补的通量元素的名称（co2_flux)
-# interval:需要参考的时间段
-'''
 
-def MDT(data, condition, value, interval=384):
-    # print(data.head(70))
-    #白天的数据重新设置索引，然后找出相应nan的数据
-    temp_data = data[condition].set_index([list(range(len(data[condition])))])
+class MDT:
+    def mdt_method(self, data, condition, value, mdt_interval=384):
+        # print(data.head(70))
+        #白天的数据重新设置索引，然后找出相应nan的数据
+        temp_data = data[condition].set_index([list(range(len(data[condition])))])
 
-    #筛选的条件
-    Condition = (temp_data[value].isnull().values==True)
-    # 缺失值的索引
-    var_index = temp_data[Condition].index.tolist()
-    # print(var_index)
-    # print(len(var_index))
+        #筛选的条件
+        Condition = (temp_data[value].isnull().values==True)
+        # 缺失值的索引
+        var_index = temp_data[Condition].index.tolist()
+        # print(var_index)
+        # print(len(var_index))
 
-    for i in var_index:
-        #在temp_data和data 相同时间条件
-        condition = (data['date_time'] == temp_data.loc[i]['date_time'])
-        data.loc[data[condition].index, value] = calculate_mean(temp_data, i, value, interval)
-    return data
+        for i in var_index:
+            #在temp_data和data 相同时间条件
+            condition = (data['date_time'] == temp_data.loc[i]['date_time'])
+            data.loc[data[condition].index, value] = calculate_mean(temp_data, i, value, mdt_interval)
+        return data
+
+def calculate_mean(data, i_index, value, mdt_interval):
+    if i_index - mdt_interval <= 0:
+        start_index = 0
+        end_index = i_index + mdt_interval
+    if i_index - mdt_interval >= 0 and i_index + mdt_interval <= len(data):
+        start_index = i_index - mdt_interval
+        end_index = i_index + mdt_interval
+    if i_index + mdt_interval > len(data):
+        start_index = i_index - mdt_interval
+        end_index = len(data)
+    temp = data[start_index: end_index + 1]
+    times = pd.DatetimeIndex(temp['date_time'])
+
+    res = temp.groupby([times.hour, times.minute])[value].mean()
+    return res[temp.loc[i_index]['date_time'].hour][temp.loc[i_index]['date_time'].minute]
 
 
-'''
-# data 白天（晚上）的数据集合
-# start_index：开始位置的索引
-# end_index:结束位置的索引
-# value ：需要插补的通量元素的名称（co2_flux)
-
-'''
 # 性能太低了
 # def calculate_mean(data, i_index, value, interval):
 #     if i_index - interval <= 0:
@@ -49,24 +54,7 @@ def MDT(data, condition, value, interval=384):
 #     res = temp.groupby([key1, key2])[value].mean()
 #
 #     return res[temp.loc[i_index]['date_time'].hour][temp.loc[i_index]['date_time'].minute]
-def calculate_mean(data, i_index, value, interval):
-    if i_index - interval <= 0:
-        start_index = 0
-        end_index = i_index + interval
-    if i_index - interval >= 0 and i_index + interval <= len(data):
-        start_index = i_index - interval
-        end_index = i_index + interval
-    if i_index + interval > len(data):
-        start_index = i_index - interval
-        end_index = len(data)
-    temp = data[start_index: end_index+1]
 
-    times = pd.DatetimeIndex(temp['date_time'])
-
-
-    res = temp.groupby([times.hour, times.minute])[value].mean()
-
-    return res[temp.loc[i_index]['date_time'].hour][temp.loc[i_index]['date_time'].minute]
 
 
 

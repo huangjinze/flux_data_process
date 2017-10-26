@@ -1,15 +1,7 @@
 import pandas as pd
 import numpy as np
 
-# % Calculate double differenced time series %
-# data 是DataFrame的值
-# return Series: co2_diff
-def Calculate_Diff(data, value):
-    a = data[value]
-    b = a.shift(1)
-    c = a.shift(-1)
-    temp_value = (a-c)-(b-a)
-    return temp_value
+
 
 def Diff_test():
     import pandas as pd
