@@ -6,8 +6,8 @@ class JudgeDN:
 
 class PAR(JudgeDN):
     def judge_dn(self, data, threshold):
-        data.loc[data['PAR_dn_Avg'] > threshold, 'daytime'] = 1
-        data.loc[data['PAR_dn_Avg'] <= threshold, 'daytime'] = 0
+        data.loc[data['PAR_net_Avg'] > threshold, 'daytime'] = 1
+        data.loc[data['PAR_net_Avg'] <= threshold, 'daytime'] = 0
         return data
 
 

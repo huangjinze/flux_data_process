@@ -4,10 +4,10 @@ import numpy as np
 class MDT:
     def mdt_method(self, data, condition, value, mdt_interval=384):
         # print(data.head(70))
-        #白天的数据重新设置索引，然后找出相应nan的数据
+        #白天的数据重新设置索引
         temp_data = data[condition].set_index([list(range(len(data[condition])))])
 
-        #筛选的条件
+        #筛选的条件，找出相应nan的数据
         Condition = (temp_data[value].isnull().values==True)
         # 缺失值的索引
         var_index = temp_data[Condition].index.tolist()

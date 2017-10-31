@@ -1,17 +1,20 @@
-import pandas as pd
-import filter_data
 from datetime import datetime
+
 import matplotlib.pyplot as plt
-import opt_data
+import pandas as pd
+
+import filter_data
 import step2_despiking_function.using_function as despike_Method
 import step4_ustar_threshold.get_ustar as Get_Ustar
 import step5_gap_fill.method as gapMethod
+from db_operation import init_data
+
 
 class CleanData(object):
     def __init__(
             self, flux_data,
             met_data, file_name,
-            value='co2_flux',
+            value,
             day_size=13, z=4
     ):
         self.file_name = file_name
@@ -105,21 +108,27 @@ class CleanData(object):
     # 第五步：插补缺失值
     def Gap_Fill(self):
         method = gapMethod.Facade()
-        self.data = method.MethodA(self.data, self.value)
-        #light_response 方法补全
-        # self.data = LR.light_response(self.data, Day_Condition, self.value, x_value='PAR_dn_Avg', interval=1000)
-
+        # self.data = method.MethodA(self.data, self.value)
+        # print(self.data)
+        method.MethodB(self.data, self.value, x_value='PAR_net_Avg')
 
 if __name__ == '__main__':
 
 
     file_path = 'data/'
 
+    CO2_file_name = 'yc_1_2012_QAQC.xlsx'
+    CO2_col_names = [
+        'CO2_filled_nlm'
+    ]
+    CO2_fill = init_data.file_read_data(CO2_col_names, file_path, CO2_file_name)
+
     # CO2通量数据读入
     #CO2通量数据文件名:yc_1_flux_2012.xls
     CO2_file_name = 'yc_1_flux_2012.xls'
     # CO2_file_name = 'yc_1_flux_test.xls'
     #CO2_col_names：该文件中需要取出来的列的名称
+
     CO2_col_names = [
         'date', 'time',
         'DOY', 'daytime',
@@ -128,22 +137,22 @@ if __name__ == '__main__':
     a = datetime.now()
 
 
-    CO2_data = opt_data.file_read_data(CO2_col_names, file_path, CO2_file_name)
-
+    CO2_data = init_data.file_read_data(CO2_col_names, file_path, CO2_file_name)
     # 气象数据读入
     # CO2通量数据文件名:yc_1_met_2012.xls
     met_file_name = 'yc_1_met_2012.xls'
     # met_file_name = 'yc_1_met_test.xls'
     # CO2_col_names：该文件中需要取出来的列的名称
     met_col_names = [
-        'TIMESTAMP', 'PAR_dn_Avg', 'Slr_Avg'
+        'TIMESTAMP', 'PAR_net_Avg', 'Slr_Avg'
     ]
-    met_data = opt_data.file_read_data(met_col_names, file_path, met_file_name)
+    met_data = init_data.file_read_data(met_col_names, file_path, met_file_name)
 
     plt.figure(figsize=(16, 8))
     # print('import data:', datetime.now() - a)
     # a = datetime.now()
     data_obj = CleanData(CO2_data, met_data, CO2_file_name, value='co2_flux')
+    data_obj.data['co2_fill'] = CO2_fill
     data_obj.check_range(flux_down_range=-20.0, flux_up_range=20.0)
     # plt.scatter(range(data_obj.data.shape[0]), data_obj.data[data_obj.value], label='check_range', s=6)
     # print('check range:', datetime.now() - a)
@@ -158,9 +167,9 @@ if __name__ == '__main__':
     # a = datetime.now()
     data_obj.Gap_Fill()
     print('Gap_Fill data:', datetime.now() - a)
-    plt.scatter(range(data_obj.data.shape[0]), data_obj.data[data_obj.value], label='Gap_Fill', s=6)
-    plt.legend()
-    plt.show()
+    # plt.scatter(range(data_obj.data.shape[0]), data_obj.data[data_obj.value], label='Gap_Fill', s=6)
+    # plt.legend()
+    # plt.show()
 
     # a = dbopt.DB()
     # data_obj.data.to_sql('test', a.engine, schema=a.schema)
