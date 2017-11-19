@@ -1,6 +1,12 @@
 import numpy as np
 def Average_Check(data, value):
-    NightData = data[(data['daytime'] == 0)]
+    '''
+    calculate FC1 and FC2
+    :param data: <dataframe>data set including =ustar= and =co2_flux=
+    :param value: <string>co2_flux
+    :return: <list> FC1_x, FC1, FC2_x, FC2
+    '''
+    NightData = data[(data['daytime'] == '0')]
 
     i = 0
     FC1 = []
@@ -23,11 +29,7 @@ def Average_Check(data, value):
             FC2_x.append(i)
 
         i=i+0.01
-
-    # print(FC1)
-    # print(FC1_x)
-    # print(FC2)
-    # print(FC2_x)
+    return FC1_x, FC1, FC2_x, FC2
 
 if __name__ == '__main__':
     FC1 = \

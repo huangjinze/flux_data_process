@@ -11,12 +11,85 @@
     "High": 300,
     "Low": -200
   },
-  "G": {
+
+  "soilG_1_Avg": {
     "High": 100,
     "Low": -50
   },
-  "Rn": {
+  "soilG_2_Avg": {
+    "High": 100,
+    "Low": -50
+  },
+  "soilG_3_Avg": {
+    "High": 100,
+    "Low": -50
+  },
+  "soilG_4_Avg": {
+    "High": 100,
+    "Low": -50
+  },
+  "soilG_5_Avg": {
+    "High": 100,
+    "Low": -50
+  },
+  "Rn_Avg": {
     "High": 300,
+    "Low": 0
+  },
+  "soil_T_1_10cm_Avg": {
+    "High": -20,
+    "Low": -40
+  },
+  "soil_T_1_30cm_Avg": {
+    "High": -20,
+    "Low": -40
+  },
+  "soil_T_2_10cm_Avg": {
+    "High": -20,
+    "Low": -40
+  },
+  "soil_T_2_30cm_Avg": {
+    "High": -20,
+    "Low": -40
+  },
+  "soil_T_3_10cm_Avg": {
+    "High": -20,
+    "Low": -40
+  },
+  "soil_T_3_30cm_Avg": {
+    "High": -20,
+    "Low": -40
+  },
+  "soil_T_4_10cm_Avg": {
+    "High": -20,
+    "Low": -40
+  },
+  "soil_T_4_30cm_Avg": {
+    "High": -20,
+    "Low": -40
+  },
+  "soil_T_5_10cm_Avg": {
+    "High": -20,
+    "Low": -40
+  },
+  "soil_T_5_30cm_Avg": {
+    "High": -20,
+    "Low": -40
+  },
+  "PAR_dn_Avg": {
+    "High": 4000,
+    "Low": 0
+  },
+  "PAR_up_Avg": {
+    "High": 1000,
+    "Low": 0
+  },
+  "PAR_net_Avg": {
+    "High": 4000,
+    "Low": 0
+  },
+  "RH_Avg": {
+    "High": 100,
     "Low": 0
   }
 }

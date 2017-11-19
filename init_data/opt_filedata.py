@@ -2,8 +2,6 @@ import pandas as pd
 from sqlalchemy import *
 from sqlalchemy.orm import *
 
-
-
 # user = 'postgres'
 # password = 'root'
 # port = '5432'
@@ -30,10 +28,17 @@ from sqlalchemy.orm import *
 # u = query.filter_by(email='123@qq.com').first()
 # print(u)
 
+
+
 def window(data, day_size=13):
     '''
     添加一列,window标签序号,如果最后一个的个数不够window_size的，则算前一个window
-
+    :param data: <dataframe>，所有数据
+    :param day_size: <int>设定的天数
+    :return:
+    <dataframe>data,增加了windows_id的数据
+    <int>windows_size,一个window大小
+    <int>window_nums,windows的个数
     '''
     window_size = day_size * 48
     window_nums = data.shape[0] // window_size
@@ -42,10 +47,16 @@ def window(data, day_size=13):
         condition = (data.windowID == window_nums)
         data.loc[condition, 'windowID'] = window_nums - 1
 
-    return data
+    return data, window_size, window_nums
 
 
 def join_data(flux_data, met_data):
+    '''
+    左连接通量和气象数据集合，连接关键字为时间
+    :param flux_data: 通量数据
+    :param met_data: 气象数据
+    :return: 通量数据和气象数据的数据集合
+    '''
     data = pd.merge(
         flux_data, met_data,
         how='right', left_on='date_time', right_on='TIMESTAMP'
@@ -91,14 +102,8 @@ def file_read_data(col_names, file_path, file_name):
     data.rename(columns={'u*': 'ustar'}, inplace=True)
     return data
 
-def db_read_data(col_names, table_name):
-    '''
-    从数据库中读取数据
-    :param col_names: 需要读取数据的列的名字
-    :param table_name: 指定读取数据的数据表
-    :return: 指定列的数据，dataframe格式
-    '''
-    pass
+
+
 
 def db_save_data(data, table_name):
     '''
@@ -109,13 +114,17 @@ def db_save_data(data, table_name):
     '''
 
 def read_conf(filename):
+    '''
+    从config文件下读取默认值
+    :param filename: 配置文件路径和文件名
+    :return: 返回json格式的配置
+    '''
     import configparser
     import json
     import os
 
     cf = configparser.ConfigParser()
 
-    # cf.read("config/dataConfig.json")
     with open(filename, 'r') as f:
         config = json.load(f)
     return config

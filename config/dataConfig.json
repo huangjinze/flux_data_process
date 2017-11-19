@@ -1,0 +1,9 @@
+{
+  "database":{
+    "user":"postgres",
+    "password":"root",
+    "port":"5432",
+    "dbname":"demo",
+    "schema": "public"
+  }
+}

@@ -27,13 +27,3 @@ class DNContext:
 
 if __name__ == '__main__':
     pass
-    # judge_dn = {}
-    # judge_dn[1] = DNContext(PAR)
-    # judge_dn[2] = DNContext(SLR)
-    # ctype = input("type:[1]for PAR,[2]for SLR")
-    # if ctype in judge_dn:
-    #     cc = judge_dn[ctype]
-    # else:
-    #     print("Undefine type. Use PAR mode.")
-    #     cc = judge_dn[1]
-    # print("you will pay:%d" % (cc.GetResult(data, threshold)))

@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import filter_data
-import step2_despiking_function.using_function as despike_Method
-import step4_ustar_threshold.get_ustar as Get_Ustar
-import step5_gap_fill.method as gapMethod
-from db_operation import init_data
+import despiking_function.using_function as despike_Method
+import ustar_threshold.get_ustar as Get_Ustar
+import gap_fill.method as gapMethod
+from init_data import opt_filedata
 
 
 class CleanData(object):
@@ -67,24 +67,24 @@ class CleanData(object):
 
             # print(data_D)
             # 对白天CO2_flux进行通量差分计算
-            temp_diff = despike_Method.Calculate_Diff(data_D, self.value)
+            temp_diff = despike_Method.calculate_Diff(data_D, self.value)
             self.data.loc[temp_diff.index, 'diff_flux'] = temp_diff
             # print(self.data)
 
             # # 对夜晚CO2_flux进行通量差分计算
-            temp_diff = despike_Method.Calculate_Diff(data_N, self.value)
+            temp_diff = despike_Method.calculate_Diff(data_N, self.value)
             self.data.loc[temp_diff.index, 'diff_flux'] = temp_diff
 
             #新加上diff_flux之后，重新获取白天黑夜的值
             data_D = self.data[Day_Win_Condition]
             data_N = self.data[Night_Win_Condition]
             # 计算MD的数据
-            self.data = despike_Method.Md_Method(data_D, data_N, self.data)
+            self.data = despike_Method.md_Method(data_D, data_N, self.data, self.value)
 
             # 计算MAD的数据,新加了一列，所以要重新选值
             data_D = self.data[Day_Win_Condition]
             data_N = self.data[Night_Win_Condition]
-            self.data = despike_Method.MAD_Method(data_D, data_N, self.data)
+            self.data = despike_Method.MAD_Method(data_D, data_N, self.data, self.value)
 
 
         di_low_range = self.data['flux_Md']-(self.z*self.data['flux_MAD'])/0.6745
@@ -104,13 +104,14 @@ class CleanData(object):
         #将u*<u*c的数据剔除
         condition = (self.data['ustar'] < ustarc) & (self.data['daytime'] == 0)
         self.data = filter_data.set_data_nan(self.data, condition, self.value)
+        self.data.to_csv('ustar.csv')
 
     # 第五步：插补缺失值
     def Gap_Fill(self):
         method = gapMethod.Facade()
         # self.data = method.MethodA(self.data, self.value)
         # print(self.data)
-        method.MethodB(self.data, self.value, x_value='PAR_net_Avg')
+        method.MethodB(self.data, self.value, x_lr_value='PAR_net_Avg', x_tr_value=['soil_T_1_10cm_Avg', 'Ta_Avg'])
 
 if __name__ == '__main__':
 
@@ -121,7 +122,7 @@ if __name__ == '__main__':
     CO2_col_names = [
         'CO2_filled_nlm'
     ]
-    CO2_fill = init_data.file_read_data(CO2_col_names, file_path, CO2_file_name)
+    CO2_fill = opt_filedata.file_read_data(CO2_col_names, file_path, CO2_file_name)
 
     # CO2通量数据读入
     #CO2通量数据文件名:yc_1_flux_2012.xls
@@ -137,16 +138,16 @@ if __name__ == '__main__':
     a = datetime.now()
 
 
-    CO2_data = init_data.file_read_data(CO2_col_names, file_path, CO2_file_name)
+    CO2_data = opt_filedata.file_read_data(CO2_col_names, file_path, CO2_file_name)
     # 气象数据读入
     # CO2通量数据文件名:yc_1_met_2012.xls
     met_file_name = 'yc_1_met_2012.xls'
     # met_file_name = 'yc_1_met_test.xls'
     # CO2_col_names：该文件中需要取出来的列的名称
     met_col_names = [
-        'TIMESTAMP', 'PAR_net_Avg', 'Slr_Avg'
+        'TIMESTAMP', 'PAR_net_Avg', 'Slr_Avg', 'Ta_Avg', 'soil_T_1_10cm_Avg'
     ]
-    met_data = init_data.file_read_data(met_col_names, file_path, met_file_name)
+    met_data = opt_filedata.file_read_data(met_col_names, file_path, met_file_name)
 
     plt.figure(figsize=(16, 8))
     # print('import data:', datetime.now() - a)
@@ -167,9 +168,9 @@ if __name__ == '__main__':
     # a = datetime.now()
     data_obj.Gap_Fill()
     print('Gap_Fill data:', datetime.now() - a)
-    # plt.scatter(range(data_obj.data.shape[0]), data_obj.data[data_obj.value], label='Gap_Fill', s=6)
-    # plt.legend()
-    # plt.show()
+    plt.scatter(range(data_obj.data.shape[0]), data_obj.data[data_obj.value], label='Gap_Fill', s=6)
+    plt.legend()
+    plt.show()
 
     # a = dbopt.DB()
     # data_obj.data.to_sql('test', a.engine, schema=a.schema)
